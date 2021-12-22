@@ -8,6 +8,7 @@ import adafruit_ltr390
 from w1thermsensor import W1ThermSensor
 from adafruit_bme280 import basic as adafruit_bme280
 from adafruit_pm25.i2c import PM25_I2C
+import os.path
 import csv
 
 # pm25_resetpin = None
@@ -25,6 +26,7 @@ particlesensor = PM25_I2C(i2c)
 
 aqdata = particlesensor.read()
 pressurekpa = barometer.pressure/10
+file_exists = os.path.exists('history.csv')
 # intermediate steps go here
 
 volts = float('%0.2f' % voltmeter.bus_voltage)
@@ -39,9 +41,13 @@ particles25 = float('%0.2f' % aqdata["pm25 env"])
 print ("Weather Logged", volts)
 
 # create/open daily history file and add the current data as a new line, delimited by commas
+if not file_exists:
+    with open('history.csv', 'a', newline='') as dailyLog:
+        writer = csv.writer(dailyLog, delimiter=',')
+        writer.writerow([" V ", " mA ", " tC ", " %rh ", " kPa ", " PM25 "])
+        
 with open("history.csv", 'a', newline='') as dailyLog:
     writer = csv.writer(dailyLog, delimiter=',')
-#    writer.writerow([" V ", " mA ", " tC " " %rh ", " kPa ", " PM25 "])
     writer.writerow([volts, milliamps, temperature, humidity, pressure, particles25])
 
 exit()

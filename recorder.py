@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import time
+from datetime import date
 import board
 import busio
 import adafruit_ina219
@@ -26,7 +27,11 @@ particlesensor = PM25_I2C(i2c)
 
 aqdata = particlesensor.read()
 pressurekpa = barometer.pressure/10
-file_exists = os.path.exists('history.csv')
+today = str(date.today())
+file_suffix = ".csv"
+file_path = "./history/"
+historyfile = file_path + today + file_suffix
+file_exists = os.path.exists(historyfile)
 # intermediate steps go here
 
 volts = float('%0.2f' % voltmeter.bus_voltage)
@@ -42,11 +47,11 @@ print ("Weather Logged", volts)
 
 # create/open daily history file and add the current data as a new line, delimited by commas
 if not file_exists:
-    with open('history.csv', 'a', newline='') as dailyLog:
+    with open(historyfile, 'a', newline='') as dailyLog:
         writer = csv.writer(dailyLog, delimiter=',')
         writer.writerow([" V ", " mA ", " tC ", " %rh ", " kPa ", " PM25 "])
         
-with open("history.csv", 'a', newline='') as dailyLog:
+with open(historyfile, 'a', newline='') as dailyLog:
     writer = csv.writer(dailyLog, delimiter=',')
     writer.writerow([volts, milliamps, temperature, humidity, pressure, particles25])
 

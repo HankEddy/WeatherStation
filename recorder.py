@@ -1,7 +1,8 @@
-#!/usr/bin/env python
+#!/usr/bin/python
 
 import time
 from datetime import date
+from datetime import datetime
 import board
 import busio
 import adafruit_ina219
@@ -18,6 +19,7 @@ import csv
 
 i2c = busio.I2C(board.SCL, board.SDA, frequency=100000)
 
+now = datetime.now()
 voltmeter = adafruit_ina219.INA219(i2c)
 lightmeter = adafruit_ltr390.LTR390(i2c)
 tempsensor = W1ThermSensor()
@@ -27,11 +29,9 @@ particlesensor = PM25_I2C(i2c)
 
 aqdata = particlesensor.read()
 pressurekpa = barometer.pressure/10
-today = str(date.today())
-file_suffix = ".csv"
-file_path = "./history/"
-historyfile = file_path + today + file_suffix
-file_exists = os.path.exists(historyfile)
+current_time = now.strftime("%H:%M")
+todayfile = now.strftime("./history/%Y-%m-%d.csv")
+file_exists = os.path.exists(todayfile)
 # intermediate steps go here
 
 volts = float('%0.2f' % voltmeter.bus_voltage)
@@ -47,12 +47,12 @@ print ("Weather Logged", volts)
 
 # create/open daily history file and add the current data as a new line, delimited by commas
 if not file_exists:
-    with open(historyfile, 'a', newline='') as dailyLog:
+    with open(todayfile, 'a', newline='') as dailyLog:
         writer = csv.writer(dailyLog, delimiter=',')
-        writer.writerow([" V ", " mA ", " tC ", " %rh ", " kPa ", " PM25 "])
+        writer.writerow(["Time", " V ", " mA ", " tC ", " %rh ", " kPa ", " PM25 "])
         
-with open(historyfile, 'a', newline='') as dailyLog:
+with open(todayfile, 'a', newline='') as dailyLog:
     writer = csv.writer(dailyLog, delimiter=',')
-    writer.writerow([volts, milliamps, temperature, humidity, pressure, particles25])
+    writer.writerow([current_time, volts, milliamps, temperature, humidity, pressure, particles25])
 
 exit()

@@ -43,7 +43,7 @@ humidity = float('%0.2f' % barometer.humidity)
 pressure = float('%0.2f' % pressurekpa)
 particles25 = float('%0.2f' % aqdata["pm25 env"])
 
-print ("Weather Logged", volts)
+print ("Weather Logged @", current_time, "-", volts, "Volts")
 
 # create/open daily history file and add the current data as a new line, delimited by commas
 if not file_exists:
